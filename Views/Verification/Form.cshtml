@@ -1,0 +1,653 @@
+﻿@model HrsVerification.Models.TimeVerificationForm
+
+
+@{
+    ViewBag.Title = "Create Form";
+    @*var fullNameJS = "";*@
+
+    bool SAN = false;
+
+    if (Model != null && Model.EmpStatus == HrsVerification.Models.EnumEmpStatus.SAN)
+    {
+        SAN = true;
+    }
+
+    @*
+    if (ViewBag.EmpStatus == HrsVerification.Models.EnumEmpStatus.SAN.ToString())
+    string queryString = Request.Url.Query;
+    if (queryString.Contains("SAN=True"))
+    {
+        SAN = true;
+    }
+    *@
+}
+
+<div id="VerificationForm">
+
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    @*   
+    @Html.Hidden("TimeVerificationForm");   
+     @Html.Hidden("TimeVerificationForm", new { TimeVerificationForm = TempData["TimeVerificationForm"] });      
+         *@  
+    <table class="noborder">
+        <colgroup>
+            <col style="width:15%;"/>
+            <col style="width:55%;"/>
+            <col style="width:15%;"/>
+            <col style="width:15%;"/>
+        </colgroup>
+        @*
+        <tr>
+            <td style="color:red"><span>1</span></td>
+            <td style="color:red; text-align:right"><span>2</span></td>
+            <td style="color:red; text-align:right"><span>3</span></td>
+        </tr>
+        *@
+
+        @if (SAN)
+        {
+            <tr>
+                <th class="noborder" style="text-align:left" colspan="2"><i><b>S</b>ervices <b>A</b>s <b>N</b>eeded Employees Verification of Hours Worked</i></th>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <th class="noborder" style="text-align:left" colspan="2"><i>Verification of Extra Hours or Sunday Hours Worked</i></th>
+                <td class="noborder" style="text-align:right" ><img src="~/Images/not-for-san-use.png" alt="" /></td>
+            </tr>
+            <tr>
+                <th class="noborder" style="text-align:left" colspan="2"><i>Full-Time or Part-Time Staff</i></th>
+            </tr>
+        }
+        @if (SAN)
+        {
+            <tr>
+                <td class="noborder" colspan="2">This form is to be completed by <b>Services As Needed (SAN)</b> employees</td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td class="noborder" colspan="2">This form is to be completed by <b>Full-Time and Part-time Staff</b></td>
+            </tr>
+            <tr>
+                <td class="noborder" colspan="2">who work extra hours or Sunday at any branch</td>
+            </tr>
+        }            
+        <tr><td class="noborder"><br /></td></tr>
+        <tr>
+            <th class="noborder" style="text-align:left">Employee Name</th>
+            <td class="noborder">
+                @Html.TextBoxFor(m => m.EmpFullName, htmlAttributes: new { style = "width:25em", maxlength = "50" })
+                @*
+                @Html.TextBox("fullNameVal", null, htmlAttributes: new { style="width:25em", maxlength="50" })
+                <input type="text" style="width:35em"  maxlength="50"/>
+                *@
+            </td>
+            <th class="noborder" style="text-align:right">Emp. ID#&nbsp;&nbsp;</th>
+            <td class="noborder">
+                @Html.TextBoxFor(m => m.EmpIdNum, htmlAttributes: new { style = "width:4em", maxlength = "6", disabled = "disabled" })
+            </td>
+        </tr>
+        <tr>
+           <th class="noborder" style="text-align:left">Job Title</th>
+            @if (SAN)
+            {
+               <td class="noborder">
+                    @Html.TextBoxFor(m => m.Title, htmlAttributes: new { style = "width:25em", maxlength = "50" }) <b>SAN</b> 
+                </td>
+            }
+            else
+            {
+               <td class="noborder">@Html.TextBoxFor(m => m.Title, htmlAttributes: new { style = "width:25em", maxlength = "50" })</td>
+            }
+            
+        </tr>
+
+        @*
+        <tr>
+            <th class="noborder" style="text-align:left">Worked at:</th>
+            <td class="noborder" style="text-align:left" ><b>BRANCH (ORG#)</b></td>
+        </tr>
+        <tr>
+            <td class="noborder"></td>
+            <td id="branchesList" class="noborder" >@Html.DropDownList("Branches", null,  new { @onchange="onBranchesChange(this.options[this.selectedIndex].value);" }) 
+                <input id="otherBranch" type="text" style="width:10em; display:none"  maxlength="20"/>
+            </td>
+        </tr>
+        *@
+
+        @if (!SAN)
+        {
+            <tr>
+                <th class="noborder" style="text-align:left">HOME BRANCH</th>
+                <td class="noborder">@Html.DropDownList("HomeBranches")</td>
+            </tr>
+        }
+        <tr><td class="noborder"><br /></td></tr>
+        <tr>
+            <th class="noborder" style="text-align:left">Worked:</th>
+        </tr>
+    </table>
+
+    
+        if (SAN)
+        { 
+        <table id="workSchedule">
+            <colgroup>
+                <col style="width:7%;"/>
+                <col style="width:4%;"/>
+                <col style="width:4%;"/>
+                <col style="width:4%;"/>
+                <col style="width:4%;"/>
+                <col style="width:4%;"/>
+                <col style="width:4%;" />
+                <col style="width:4%;"/>
+                <col style="width:4%;"/>
+                <col style="width:8%;"/>    @* minutes *@
+                <col style="width:9%;"/>    @* Total Hrs *@
+                <col style="width:10%;"/>   @* Branch *@
+                <col style="width:20%;"/>    @*  *@
+            </colgroup>
+
+            @*
+            <tr>
+                @for (var i = 0; i < 20; i++)
+                {   
+                    <td style="color:blue"><span>@i</span></td>
+                }
+            </tr>
+            *@
+
+            <thead>                    
+                <tr>
+                    <th colspan="1" rowspan="2">Date</th>
+                    <th colspan="4">Schedule</th>
+                    <th colspan="5">Lunch</th>
+                    <th colspan="1" rowspan="2">Total Hrs Worked<br />(minus lunch period)</th>
+                    @*
+                    <th colspan="1" rowspan="2">Holiday<br />Time</th>
+                    *@
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Worked at</td>
+                </tr>
+                <tr>
+                    <th colspan="1">From</th>
+                    <th colspan="1">am<br />pm</th>
+                    <th colspan="1">To</th>
+                    <th colspan="1">am<br />pm</th>
+                    <th colspan="1">From</th>
+                    <th colspan="1">am<br />pm</th>
+                    <th colspan="1">To</th>
+                    <th colspan="1">am<br />pm</th>
+                    <th colspan="1">Mins</th>
+                </tr>
+            </thead>                    
+    
+            <tbody>
+                @if (@Model != null && @Model.WorkedTimes != null)
+                {
+                    foreach (var wt in @Model.WorkedTimes)
+                    {
+                        DateTime scheduleFrom = wt.ScheduleFrom;
+                        var frDt = scheduleFrom.Month + "/" + scheduleFrom.Day + "/" + scheduleFrom.Year;
+                        var fr = (scheduleFrom.Hour >= 12 ? scheduleFrom.Hour - 12 : scheduleFrom.Hour) + ":" + (scheduleFrom.Minute == 0 ? "00" : scheduleFrom.Minute.ToString());
+                        var frAmPm = "am";
+                        if (scheduleFrom.Hour >= 12)
+                        {
+                            frAmPm = "pm";
+                        }
+
+                        var to = (wt.ScheduleTo.Hour >= 12 ?  wt.ScheduleTo.Hour - 12 :  wt.ScheduleTo.Hour) + ":" + (wt.ScheduleTo.Minute == 0 ? "00" : wt.ScheduleTo.Minute.ToString());
+                        var toAmPm = "am";
+                        if (wt.ScheduleTo.Hour >= 12)
+                        {
+                            toAmPm = "pm";
+                        }
+                            
+                            
+                        DateTime lunchFrom = (DateTime)wt.LunchFrom;
+                        var luFr = lunchFrom.Hour + ":" + (lunchFrom.Minute == 0 ? "00" : lunchFrom.Minute.ToString());
+                        var luFrAmPm = "am";
+                        if (lunchFrom.Hour >= 12)
+                        {
+                            luFrAmPm = "pm";
+                        }
+                        
+                            
+                        DateTime lunchTo = (DateTime)wt.LunchTo;
+                        var luTo = lunchTo.Hour + ":" + (lunchTo.Minute == 0 ? "00" : lunchTo.Minute.ToString());
+                        var luToAmPm = "am";
+                        if (lunchTo.Hour >= 12)
+                        {
+                            luToAmPm = "pm";
+                        }                    
+                        <tr>
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => frDt)
+                            </td>
+
+                            @* schedule *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => fr)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => frAmPm)
+                            </td>
+                                                
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => to)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => toAmPm)
+                            </td>
+
+                            @* lunch *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => luFr)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => luFrAmPm)
+                            </td>
+                                                
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => luTo)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => luToAmPm)
+                            </td>
+
+                            @* mintutes *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.LunchTime)
+                            </td>
+
+                            @* total hrs *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.TotalHrsWorked)
+                            </td>
+
+                            @* branch *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.WorkBranchOrgId)
+                            </td>
+                       </tr>
+                    }
+                }
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="12"> 
+                        <div class='entry'>
+                            <span>
+                                <button type="button" id="getforms">Add Worked Time</button>
+                               @*
+                                <a href="@Url.Action("AddRow", "Verification", new { Model.Title })">Add a Row</a>
+                 <button type="button" id="getforms">Get Forms</button>
+
+                           @Html.ActionLink("Add Row", "AddRow",  "Verification", new { IsSAN = ViewBag.IsSAN, timeVerForm = @Model }, new { onclick = "callAddRow();" })
+                             *@
+                           </span>
+                        </div>
+                       @*
+                        @Ajax.ActionLink("Add Row", "AddRow",  new { IsSAN = ViewBag.IsSAN }, new AjaxOptions 
+                        {
+                            HttpMethod = "GET",
+                            OnSuccess = "successCall"
+                        })
+                        *@
+
+                    </td>
+                </tr>  
+            </tfoot>
+        </table>
+        }
+        else
+        {
+        <table id="workSchedule">
+            <colgroup>
+                <col style="width:7%;"/>   @* Date *@
+                <col style="width:4%;"/>    @* Sun# *@
+                <col style="width:4%;"/>    @* SHA *@
+                <col style="width:4%;"/>    @* From *@
+                <col style="width:4%;"/>    @* ap/pm *@
+                <col style="width:4%;"/>    @* To *@
+                <col style="width:4%;"/>    @* am/pm *@
+                <col style="width:4%;"/>    @* From *@
+                <col style="width:4%;"/>    @* am/pm *@
+                <col style="width:4%;"/>    @* To *@
+                <col style="width:4%;"/>    @* am/pm *@
+                <col style="width:8%;"/>    @* Minutes *@
+                <col style="width:9%;"/>    @* Total Hrs *@
+                <col style="width:6%;"/>    @* Holiday *@
+                <col style="width:10%;"/>    @* Branch *@
+                <col style="width:20%;"/>    @*  *@
+            </colgroup>
+
+            @*
+            <tr>
+                @for (var i = 0; i < 20; i++)
+                {   
+                    <td style="color:blue"><span>@i</span></td>
+                }
+            </tr>
+            *@
+
+            <thead>                    
+                <tr>
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Date</b>                                                                                                 
+                    </td>
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Sund.<br />#</td>
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>SHA Hrs</td>
+                    <td colspan="4" style="text-align:center"><b>Schedule</td>
+                    <td colspan="5" style="text-align:center"><b>Lunch</td>
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Total Hrs Worked<br />(minus lunch period)</td>     
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Holiday<br />Time</td>
+                    <td colspan="1" rowspan="2" style="text-align:center"><b>Worked at</td>
+
+                    @*
+                    <td class="noboder" colspan="1" rowspan="2" style="text-align:center"></td>
+                    @if (ViewBag.IsSAN)
+                    {
+                        <td colspan="1"></td>
+                    }
+                    else
+                    {
+                        <td colspan="1" rowspan="2" style="text-align:center"><b>Holiday<br />Time</td>
+                    }
+                    *@
+
+                </tr>
+                <tr>
+                    <td colspan="1" style="text-align:center"><b>From</td>
+                    <td colspan="1" style="text-align:center"><b>am<br />pm</td>
+                    <td colspan="1" style="text-align:center"><b>To</td>
+                    <td colspan="1" style="text-align:center"><b>am<br />pm</td>
+                    <td colspan="1" style="text-align:center"><b>From</td>
+                    <td colspan="1" style="text-align:center"><b>am<br />pm</td>
+                    <td colspan="1" style="text-align:center"><b>To</td>
+                    <td colspan="1" style="text-align:center"><b>am<br />pm</td>
+                    <td colspan="1" style="text-align:center"><b>Mins</td>
+                </tr>
+            </thead>                    
+    
+            <tbody>
+                @if (@Model != null && @Model.WorkedTimes != null)
+                {
+                    foreach (var wt in @Model.WorkedTimes)
+                    {
+                        DateTime scheduleFrom = wt.ScheduleFrom;
+                        var frDt = scheduleFrom.Month + "/" + scheduleFrom.Day + "/" + scheduleFrom.Year;
+                        var fr = (scheduleFrom.Hour >= 12 ? scheduleFrom.Hour - 12 : scheduleFrom.Hour) + ":" + (scheduleFrom.Minute == 0 ? "00" : scheduleFrom.Minute.ToString());
+                        var frAmPm = "am";
+                        if (scheduleFrom.Hour >= 12)
+                        {
+                            frAmPm = "pm";
+                        }
+
+                        var to = (wt.ScheduleTo.Hour >= 12 ?  wt.ScheduleTo.Hour - 12 :  wt.ScheduleTo.Hour) + ":" + (wt.ScheduleTo.Minute == 0 ? "00" : wt.ScheduleTo.Minute.ToString());
+                        var toAmPm = "am";
+                        if (wt.ScheduleTo.Hour >= 12)
+                        {
+                            toAmPm = "pm";
+                        }
+                            
+                            
+                        DateTime lunchFrom = (DateTime)wt.LunchFrom;
+                        var luFr = lunchFrom.Hour + ":" + (lunchFrom.Minute == 0 ? "00" : lunchFrom.Minute.ToString());
+                        var luFrAmPm = "am";
+                        if (lunchFrom.Hour >= 12)
+                        {
+                            luFrAmPm = "pm";
+                        }
+                        
+                            
+                        DateTime lunchTo = (DateTime)wt.LunchTo;
+                        var luTo = lunchTo.Hour + ":" + (lunchTo.Minute == 0 ? "00" : lunchTo.Minute.ToString());
+                        var luToAmPm = "am";
+                        if (lunchTo.Hour >= 12)
+                        {
+                            luToAmPm = "pm";
+                        }                    
+                        <tr>
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => frDt)
+                            </td>
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.SundayNum)
+                            </td>
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.SHAHrs)
+                            </td>
+
+                            @* schedule *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => fr)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => frAmPm)
+                            </td>
+                                                
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => to)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => toAmPm)
+                            </td>
+
+                            @* lunch *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => luFr)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => luFrAmPm)
+                            </td>
+                                                
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => luTo)
+                            </td>
+                            <td style="text-align:center">
+                                @Html.DisplayFor(t => luToAmPm)
+                            </td>
+
+                            @* mintutes *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.LunchTime)
+                            </td>
+
+                            @* total hrs *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.TotalHrsWorked)
+                            </td>
+
+                            @* holiday time *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.HolidayTime)
+                            </td>
+ 
+                            @* branch *@
+                            <td style="text-align:right">
+                                @Html.DisplayFor(t => wt.WorkBranchOrgId)
+                            </td>
+                       </tr>
+                    }
+                }
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td colspan="15"> 
+                        <button type="button" id="getforms">Add Worked Time</button>
+                                @*                    
+                        @Html.ActionLink("Add Row", "AddRow", "Verification", new { timeVerForm = @Model }, null)
+                   *@
+
+                    </td>
+                </tr>  
+            </tfoot>
+        </table>
+        }
+
+ 
+    <table class="noborder">
+        <colgroup>
+            <col style="width:10%;"/>
+            <col style="width:90%;"/>
+        </colgroup>
+        @*
+        <tr>
+            <td style="color:red"><span>1</span></td>
+            <td style="color:red; text-align:right"><span>2</span></td>
+            <td style="color:red; text-align:right"><span>3</span></td>
+        </tr>
+        *@
+
+        <tr><td class="noborder"><br /></td></tr>
+        <tr>
+            <th class="noborder" colspan="2" style="text-align:left"><b>Verified by:</b>&nbsp;&nbsp;<input type="text" style="width:80%" maxlength="50"/></th>
+        </tr>
+        <tr>
+            <td class="noborder" colspan="1"></td>
+            <td class="noborder" colspan="2" style="text-align:left">(Branch Manager, Library Circulation Supervisor, or Person in Charge at Branch Worked)</td>
+        </tr>
+        <tr><td class="noborder"><br /></td></tr>
+        @if (SAN)
+        {
+            <tr>
+                <td class="noborder" style="text-align:left">DISTRIBUTION:</td>
+                <td class="noborder" style="text-align:left">Original signed copy must be sent to Payroll.</td>
+            </tr>
+            <tr>
+                <td class="noborder" colspan="1"></td>
+                <td class="noborder" colspan="2" style="text-align:left">Employee retains copy.</td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td class="noborder" style="text-align:left">DISTRIBUTION:</td>
+                <td class="noborder" style="text-align:left">Original signed copy must be sent to your supervisor (time verifier at your home branch).</td>
+            </tr>
+            <tr>
+                <td class="noborder" colspan="1"></td>
+                <td class="noborder" colspan="2" style="text-align:left">Employee retains copy.</td>
+            </tr>
+            <tr>
+                <td class="noborder" colspan="1"></td>
+                <td class="noborder" colspan="2" style="text-align:left">After supervisor verifies time, original sent to Payroll.</td>
+            </tr>
+        }
+    </table>
+
+    <p>
+       <input type="submit" value="Save" />
+       <input type="submit" value="Route Form" />
+    </p>           
+
+    @*       @Html.Hidden("fullName")
+ 
+
+            <fieldset>
+                <legend>Date-Time Selectors</legend>
+
+                <p>
+                    Start Date + Time:
+                    <br />
+                    <input type="text" id="sDate" name="sDate" class="date-time" />
+                </p>
+
+                <p>
+                    End Date + Time:
+                    <br />
+                    <input type="text" id="eDate" name="eDate" class="date-time" />
+                </p>
+
+                <p>
+                    Formatted Date + Time (dd-mm-yy):
+                    <br />
+                    <input type="text" id="ukFormat" name="ukFormat" />
+                </p>
+
+                <p>
+                    onSelect and onClose event:
+                    <br />
+                    <input type="text" id="dateTimePicker" name="dateTimePicker" /> <span id="day">day</span> <span id="month">month</span> <span id="year">year</span> <span id="time">time</span>                  
+                </p>
+
+            </fieldset>    
+    *@
+}
+
+@section scripts {
+ 
+    @*
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @Scripts.Render("~/bundles/jqueryui")
+    @Styles.Render("~/Content/themes/base/css")
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-1.5.1.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-1.8.11.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery-ui-timepicker-addon.js")" type="text/javascript"></script>
+    *@
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#EmpFullName').blur(function () {
+                //alert($('#EmpFullName').val());
+                $('#fullNameJS').val($('#EmpFullName').val());
+               // alert($('#EmpFullName').val());
+            });
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        function callAddRow(result) {
+            // $('#fullNameJS').val($('#EmpFullName').val());
+            //alert($('#EmpFullName').val());
+        }
+     </script>
+
+    <script type="text/javascript">
+        $('#getforms').click(function (value) {
+            var name = $("#EmpFullName").val();
+            var title = $("#Title").val();
+            var branch = $("#HomeBranches").val();
+
+            var url = '@Url.Action("AddRow", "Verification", new { paramsVal = "_paramsVal_" })';
+            url = url.replace("_paramsVal_", "name=" + name + '!' + "title=" + title + '!' + "branch=" + branch);
+            window.location.href = url;
+            
+            //$.ajax({
+            //    url: '@Url.Action("AddRow", "Verification")',//'@Url.Content("~/Verification/AddRow")',
+            //    type: 'GET',
+           //     contentType: 'application/json; charset=utf-8',
+            //    data: {
+            //        fullName: name,
+            //        title: t,
+            //        homeBranch: branch
+            //    },
+            
+            //    success: function (result) {
+             //       //$('#ViewResult').html(result);
+            //    }
+            //});
+         
+            return true;
+        });
+
+</script>
+
+}
+

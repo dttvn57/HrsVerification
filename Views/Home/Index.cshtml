@@ -1,0 +1,132 @@
+﻿@using HrsVerification.Helpers;
+
+
+@model HrsVerification.Models.EmpStatusViewModel
+
+
+@{
+    ViewBag.Title = "";
+    ViewBag.trung = "SAN";
+}
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+        </div>
+    </section>
+
+}
+
+@*
+<div>
+    @Html.DropDownList("EmployeeTypes", null,  new { @onchange="onEmployeeTypesChange(this.options[this.selectedIndex].value);" }) 
+</div>  
+*@
+
+@using (Html.BeginForm("Create", "Verification", FormMethod.Get))
+{
+    @Html.ValidationSummary(false)
+       <table style="width: 40%; border:0 none; table-layout: fixed; border-collapse: separate">
+            <colgroup>
+                    <col style="width:20%;"/>
+                    <col style="width:12%;"/>
+            </colgroup>
+            <tr>
+                <th style="text-align:left; border:0 none;">Employment Status:</th>
+                <td style="text-align:left; border:0 none;">
+                    @Html.DropDownList("EmploymentStatus", null, htmlAttributes: new { style = "width:100%" })
+                </td>
+            </tr>
+            <tr>
+                <th style="text-align:left; border:0 none;">Employee ID:</th>
+                <td style="text-align:left; border:0 none;">@Html.TextBox("EmployeeID", null, htmlAttributes: new { required = "required", style = "width:100%", maxlength = "10" })
+                    @Html.ValidationMessage("Employee ID is required")
+                </td>
+            </tr>
+           <tr><td style="text-align:left; border:0 none;"><br></td></tr>
+            <tr>
+                <td style="text-align:right; border:0 none;"><input type="submit" value="Create" /></td>
+            </tr>
+        </table>           
+}
+
+@* --------------
+     @Html.ActionLink("Create", "Create", "Verification", new { EmploymentStatus = Model.EmpStatus.ToString() }, null); 
+            <input id="submit" type="button" value="Save" name="submit" />
+     @Html.ActionLink("Create", "Create", "Verification") //, new { SelectedEmpStatus = Model.EmpTypes.ToString() }, null); 
+    @Html.ActionLink("Modify", "Create", "Verification", null, new { id = "modifylink" })
+
+   <script type="text/javascript">
+        $(function () {
+            $('#modifylink').click(function () {
+                var type = $('#EmpStatus').val();
+                //alert(type);
+                $.ajax({
+                    url: this.href,
+                    type: 'GET',
+                    data: { SelectedEmpStatus: type }
+                    //complete: function() {
+                    //    $('#progress').hide();
+                    //},
+                    //success: function (result) {
+                    //    alert("success");
+                    //}
+                });
+                return true;
+            });
+        })
+    </script>
+
+@section scripts {
+    <script type="text/javascript">
+        function onEmployeeTypesChange(value) {
+            //alert(value);
+            //    @ViewBag.EmpStatus = value;
+           // else
+           // if (value == "Permanent")
+            //    ViewBag.EmpStatus = HrsVerification.Models.EnumEmpStatus.Permanent;
+            //alert($(ViewBag.EmpStatus)..val());
+           // alert(@ViewBag.EmpStatus);
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(function() {
+
+            $("#modifylink").live("click", function (e) {
+                
+                //e.preventDefault();
+                var data = JSON.stringify({ EmpStatus: $('#EmpStatus').val() });
+                alert(data);
+                $.ajax({
+                    type: "GET",
+                    url: this.href,
+                    //url: config.basePath + '/Verification/Create',
+                    cache: false,
+                    data: data,
+                    dataType: this.dataType,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+ 
+                        if (result.IsSuccess) {
+                         }
+                        else {
+                         }
+                    },
+                    error: function (data) {
+                        // $("#error_message").html(data);
+
+                    }
+                }); // End ajax call
+
+ 
+
+            });
+        })
+    </script>
+----------------------- *@
+
